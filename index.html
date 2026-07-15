@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta property="og:title" content="LOVEFU 使用心得回饋">
+<meta property="og:description" content="花 5 分鐘跟我們說說你的使用感受，照片或影片也很歡迎一起分享 🌿">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌙</text></svg>">
+<title>LOVEFU 使用心得回饋</title>
+<style>
+  :root {
+    --brand: #3d6b5e;
+    --brand-dark: #2e5248;
+    --bg: #f6f4ef;
+    --card: #ffffff;
+    --text: #33302b;
+    --muted: #8a857c;
+    --line: #e6e1d8;
+    --err: #c0564a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 24px 16px 64px;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; }
+  .hero {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .hero .tag {
+    display: inline-block;
+    background: var(--brand);
+    color: #fff;
+    font-size: 13px;
+    letter-spacing: 2px;
+    padding: 4px 14px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+  }
+  .hero h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+  .hero p { font-size: 14px; color: var(--muted); }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  label.q {
+    display: block;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+  .hint { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+  .req { color: var(--err); margin-left: 2px; }
+  input[type=text], textarea, select {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-family: inherit;
+    background: #fdfcfa;
+    color: var(--text);
+  }
+  input[type=text]:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--brand);
+  }
+  textarea { min-height: 96px; resize: vertical; }
+  .files-box {
+    border: 2px dashed var(--line);
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s;
+  }
+  .files-box:hover { border-color: var(--brand); }
+  .files-box .big { font-size: 15px; font-weight: 700; color: var(--brand); }
+  .files-box .small { font-size: 13px; color: var(--muted); }
+  #fileInput { display: none; }
+  .file-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    background: #fdfcfa;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 8px 12px;
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  .file-item .fname { flex: 1; min-width: 0; word-break: break-all; }
+  .file-item .fsize { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  .file-item .rm {
+    border: none; background: none; color: var(--err);
+    font-size: 16px; cursor: pointer; padding: 2px 6px;
+  }
+  .progress-outer {
+    height: 6px; background: var(--line); border-radius: 999px;
+    overflow: hidden; margin-top: 6px; display: none;
+    width: 100%;
+  }
+  .progress-inner { height: 100%; width: 0%; background: var(--brand); transition: width .2s; }
+  .consent {
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: 14px;
+  }
+  .consent input { margin-top: 5px; transform: scale(1.2); }
+  button.submit {
+    width: 100%;
+    background: var(--brand);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  button.submit:hover { background: var(--brand-dark); }
+  button.submit:disabled { background: #b8c4bf; cursor: not-allowed; }
+  #status { text-align: center; font-size: 14px; color: var(--muted); margin-top: 12px; min-height: 22px; }
+  #status.error { color: var(--err); }
+  .done {
+    display: none;
+    text-align: center;
+    padding: 48px 20px;
+  }
+  .done .emoji { font-size: 48px; margin-bottom: 12px; }
+  .done h2 { font-size: 22px; margin-bottom: 8px; }
+  .done p { color: var(--muted); font-size: 15px; }
+  .field { margin-bottom: 20px; }
+  .field:last-child { margin-bottom: 0; }
+
+  /* ===== 上傳中全螢幕等待畫面 ===== */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(246, 244, 239, .95);
+    z-index: 50;
+    display: none;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 24px;
+  }
+  .overlay.show { display: flex; }
+  .overlay .box { max-width: 320px; width: 100%; }
+  .spinner {
+    width: 56px; height: 56px;
+    border: 5px solid var(--line);
+    border-top-color: var(--brand);
+    border-radius: 50%;
+    margin: 0 auto 18px;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .overlay h3 { font-size: 17px; margin-bottom: 6px; color: var(--text); }
+  .overlay .detail { font-size: 14px; color: var(--muted); margin-bottom: 14px; }
+  .overlay .op-outer {
+    height: 8px; background: var(--line); border-radius: 999px; overflow: hidden;
+  }
+  .overlay .op-inner {
+    height: 100%; width: 0%; background: var(--brand);
+    border-radius: 999px; transition: width .2s;
+  }
+  .overlay .pct { font-size: 13px; color: var(--brand); font-weight: 700; margin-top: 8px; }
+  .overlay .warn { font-size: 12px; color: var(--muted); margin-top: 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero" id="hero">
+    <span class="tag">LOVEFU大島樂眠</span>
+    <h1>最真實的心得回饋</h1>
+    <p>謝謝你相信我們，希望你能花 5 分鐘跟我們說說你的使用感受，<br>照片或影片也很歡迎一起分享 🌿</p>
+  </div>
+
+  <form id="form" onsubmit="return false;">
+
+    <div class="card">
+      <div class="field">
+        <label class="q">該怎麼稱呼你呢？<span class="req">*</span></label>
+        <div class="hint">綽號也可以！</div>
+        <input type="text" id="name" placeholder="例：一直都睡不好的王小明" required>
+      </div>
+
+      <div class="field">
+        <label class="q">你想分享的的商品<span class="req">*</span></label>
+        <select id="product" required onchange="toggleOther()">
+          <option value="" disabled selected>請選擇</option>
+          <option>月眠枕3.0</option>
+          <option>無光薄墊</option>
+          <option>無光厚墊</option>
+          <option>山丘樂眠床</option>
+          <option>飄雲樂眠床</option>
+          <option>冰島樂眠床</option>
+          <option>原木懸浮床架</option>
+          <option>竹眠親膚寢飾</option>
+          <option>其他</option>
+        </select>
+        <input type="text" id="productOther" placeholder="請填寫商品名稱" style="display:none; margin-top:8px;">
+      </div>
+
+      <div class="field">
+        <label class="q">請問你使用多久了？<span class="req">*</span></label>
+        <select id="duration" required>
+          <option value="" disabled selected>請選擇</option>
+          <option>未滿 2 週</option>
+          <option>2 週～1 個月</option>
+          <option>1～3 個月</option>
+          <option>3 個月以上</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="q">你的年齡區間</label>
+        <div class="hint">改寫故事時用來設定匿名主角，不會透露是你</div>
+        <select id="age">
+          <option value="" selected>不方便說</option>
+          <option>20 歲以下</option>
+          <option>21～30 歲</option>
+          <option>31～40 歲</option>
+          <option>41～50 歲</option>
+          <option>51～60 歲</option>
+          <option>60 歲以上</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="q">用一句話描述你的身分／生活型態</label>
+        <div class="hint">例如：久坐辦公室的上班族、輪班工程師、二寶媽……</div>
+        <input type="text" id="identity" placeholder="例：每天騎車通勤的業務">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="field">
+        <label class="q">用之前，你有什麼困擾？<span class="req">*</span></label>
+        <div class="hint">請至少寫 30 個字。例如：什麼時候開始的、多常發生、對白天的影響…越具體越好</div>
+        <textarea id="before" placeholder="例：大概兩年前開始，每天躺下都要滑手機到一兩點才睡得著，隔天上班都覺得肩頸很緊、精神很差…" required></textarea>
+      </div>
+
+      <div class="field">
+        <label class="q">入睡時間的變化</label>
+        <div class="hint">選填，但有具體對比，故事會更有說服力！</div>
+        <div style="display:flex; gap:10px;">
+          <div style="flex:1;">
+            <div class="hint" style="margin-bottom:4px;">以前大概要</div>
+            <select id="sleepBefore">
+              <option value="" selected>不確定</option>
+              <option>15 分鐘內</option>
+              <option>15～30 分鐘</option>
+              <option>30 分鐘～1 小時</option>
+              <option>1 小時以上</option>
+            </select>
+          </div>
+          <div style="flex:1;">
+            <div class="hint" style="margin-bottom:4px;">現在大概要</div>
+            <select id="sleepAfter">
+              <option value="" selected>不確定</option>
+              <option>15 分鐘內</option>
+              <option>15～30 分鐘</option>
+              <option>30 分鐘～1 小時</option>
+              <option>1 小時以上</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="q">平常都怎麼用？在什麼情境下用？</label>
+        <div class="hint">例如：午休靠著用、追劇時墊腰、睡前先躺 10 分鐘…</div>
+        <textarea id="scene" placeholder="我通常是…"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="q">用了之後，最有感的改變是什麼？<span class="req">*</span></label>
+        <div class="hint">請至少寫 30 個字。身體的感覺、睡眠的變化、心情的不同都可以</div>
+        <textarea id="change" placeholder="例：最明顯是半夜不會醒來了，以前一晚醒兩三次，現在幾乎一覺到天亮，早上起來脖子也不痠了…" required></textarea>
+      </div>
+
+      <div class="field">
+        <label class="q">有沒有印象最深刻的一刻？</label>
+        <div class="hint">一個小故事、家人朋友的反應、某個「哇」的瞬間</div>
+        <textarea id="story" placeholder="有一次…"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="q">如果要推薦給朋友，你會怎麼說？<span class="req">*</span></label>
+        <input type="text" id="oneLiner" placeholder="一句話也可以，當然越多越好" required>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="q">照片／影片分享</label>
+      <div class="hint">實際使用的照片或影片（可多個檔案）。有畫面，故事會更有溫度！</div>
+      <div class="files-box" onclick="document.getElementById('fileInput').click()">
+        <div class="big">＋ 點這裡選擇檔案</div>
+        <div class="small">支援照片與影片，可一次選多個</div>
+      </div>
+      <input type="file" id="fileInput" multiple accept="image/*,video/*">
+      <div id="fileList"></div>
+    </div>
+
+    <div class="card">
+      <label class="consent">
+        <input type="checkbox" id="consent" required>
+        <span>我同意 LOVEFU大島樂眠 將我的使用心得與提供的照片／影片，改寫、編輯後以<strong>匿名方式</strong>刊登於官網、社群等素材。<span class="req">*</span></span>
+      </label>
+    </div>
+
+    <button class="submit" id="submitBtn" onclick="submitForm()">送出回饋</button>
+    <div id="status"></div>
+  </form>
+
+  <div class="done card" id="done">
+    <div class="emoji">🌙</div>
+    <h2>收到了，謝謝你！</h2>
+    <p>你的心得已經送出。<br>謝謝你讓更多人聽見真實的使用感受，祝你天天好眠 🌿</p>
+  </div>
+
+</div>
+
+<!-- 上傳中等待畫面 -->
+<div class="overlay" id="overlay">
+  <div class="box">
+    <div class="spinner"></div>
+    <h3 id="ovTitle">正在送出…</h3>
+    <div class="detail" id="ovDetail">&nbsp;</div>
+    <div class="op-outer"><div class="op-inner" id="ovBar"></div></div>
+    <div class="pct" id="ovPct">0%</div>
+    <div class="warn">上傳中請保持螢幕開啟，不要關閉或重新整理頁面</div>
+  </div>
+</div>
+
+<script>
+  // 後端：Google Apps Script 網頁應用程式（部署後的 /exec 網址）
+  var API_URL = 'https://script.google.com/macros/s/AKfycbwa3dd_b6QHrRdAl2GlIi1sArX2PoVpJn6pvXfU5c9IzP36isJPvzJ5GcBE7RHvKUN_OQ/exec';
+
+  // 這次填寫的防重複代碼：同一次填寫重試送出時沿用，後端據此避免寫入重複資料
+  var SUBMIT_ID = (window.crypto && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : String(Date.now()) + '-' + Math.random().toString(36).slice(2);
+
+  // 部署防呆：API 網址沒設定好就直接鎖住表單，不讓人白填
+  if (!/^https:\/\/script\.google\.com\//.test(API_URL)) {
+    document.getElementById('submitBtn').disabled = true;
+    var _st = document.getElementById('status');
+    _st.textContent = '表單系統設定中，請稍後再試或聯絡管理者。';
+    _st.className = 'error';
+  }
+
+  var pickedFiles = [];
+  var RELAY_CHUNK = 8 * 1024 * 1024; // 備援模式的分段大小（8MB，須為 256KB 倍數）
+
+  document.getElementById('fileInput').addEventListener('change', function (e) {
+    for (var i = 0; i < e.target.files.length; i++) {
+      pickedFiles.push(e.target.files[i]);
+    }
+    e.target.value = '';
+    renderFileList();
+  });
+
+  function renderFileList() {
+    var box = document.getElementById('fileList');
+    box.innerHTML = '';
+    pickedFiles.forEach(function (f, idx) {
+      var div = document.createElement('div');
+      div.className = 'file-item';
+      div.innerHTML =
+        '<span class="fname"></span>' +
+        '<span class="fsize">' + prettySize(f.size) + '</span>' +
+        '<button type="button" class="rm" title="移除">✕</button>' +
+        '<div class="progress-outer"><div class="progress-inner"></div></div>';
+      div.querySelector('.fname').textContent = f.name;
+      div.querySelector('.rm').onclick = function () {
+        pickedFiles.splice(idx, 1);
+        renderFileList();
+      };
+      box.appendChild(div);
+    });
+  }
+
+  function prettySize(b) {
+    if (b > 1024 * 1024 * 1024) return (b / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+    if (b > 1024 * 1024) return (b / (1024 * 1024)).toFixed(1) + ' MB';
+    return Math.max(1, Math.round(b / 1024)) + ' KB';
+  }
+
+  // ===== 等待畫面控制 =====
+  function overlayShow(title, detail) {
+    document.getElementById('ovTitle').textContent = title;
+    document.getElementById('ovDetail').textContent = detail || '';
+    document.getElementById('overlay').classList.add('show');
+  }
+  function overlayProgress(pct) {
+    pct = Math.max(0, Math.min(100, Math.round(pct)));
+    document.getElementById('ovBar').style.width = pct + '%';
+    document.getElementById('ovPct').textContent = pct + '%';
+  }
+  function overlayHide() {
+    document.getElementById('overlay').classList.remove('show');
+  }
+
+  // 呼叫 Apps Script API（用 text/plain 送 JSON，避開跨網域預檢）
+  async function api(payload) {
+    var res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('連線失敗（HTTP ' + res.status + '）');
+    var out = await res.json();
+    if (!out || !out.ok) throw new Error((out && out.error) || '伺服器回應異常');
+    return out;
+  }
+
+  function readSliceAsBase64(file, start, end) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        resolve(reader.result.split(',')[1]);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file.slice(start, end));
+    });
+  }
+
+  /**
+   * 方案 A（快）：瀏覽器直接上傳到 Google 上傳伺服器，一次整個檔案，
+   * 用 XHR 的 upload.onprogress 顯示真實進度。
+   */
+  function directUpload(sessionUrl, file, onPct) {
+    return new Promise(function (resolve, reject) {
+      var progress = 0;
+      var xhr = new XMLHttpRequest();
+      xhr.open('PUT', sessionUrl);
+      xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+      xhr.upload.onprogress = function (e) {
+        if (e.lengthComputable) {
+          progress = e.loaded / e.total;
+          onPct(progress * 100);
+        }
+      };
+      xhr.onload = function () {
+        if (xhr.status === 200 || xhr.status === 201) {
+          try {
+            resolve(JSON.parse(xhr.responseText).id);
+          } catch (err) { resolve(null); }
+        } else if (progress >= 1) {
+          resolve(null);
+        } else {
+          reject(new Error('HTTP ' + xhr.status));
+        }
+      };
+      xhr.onerror = function () {
+        if (progress >= 1) resolve(null);
+        else reject(new Error('direct-upload-blocked'));
+      };
+      xhr.send(file);
+    });
+  }
+
+  /**
+   * 方案 B（備援）：經由 Apps Script 分段轉傳（較慢，但一定通）。
+   */
+  async function relayUpload(sessionUrl, file, onPct) {
+    var offset = 0;
+    while (offset < file.size) {
+      var end = Math.min(offset + RELAY_CHUNK, file.size);
+      var b64 = await readSliceAsBase64(file, offset, end);
+      var result;
+      for (var attempt = 1; ; attempt++) {
+        try {
+          result = await api({
+            action: 'uploadChunk',
+            sessionUrl: sessionUrl,
+            base64Data: b64,
+            start: offset,
+            total: file.size,
+            mimeType: file.type || 'application/octet-stream'
+          });
+          break;
+        } catch (e) {
+          if (attempt >= 3) throw e;
+          await new Promise(function (r) { setTimeout(r, 1500 * attempt); });
+        }
+      }
+      offset = end;
+      onPct((offset / file.size) * 100);
+      if (result.done) return result.fileId;
+    }
+    throw new Error('上傳未完成：' + file.name);
+  }
+
+  async function initUpload(displayName, file, withOrigin) {
+    var payload = {
+      action: 'initUpload',
+      fileName: displayName,
+      mimeType: file.type || 'application/octet-stream'
+    };
+    // 只有瀏覽器直傳需要綁定 Origin；備援走 Apps Script 轉傳時不綁，session 才不挑來源
+    if (withOrigin) payload.origin = location.origin;
+    var out = await api(payload);
+    return out.sessionUrl;
+  }
+
+  async function uploadOneFile(file, displayName, onPct) {
+    var sessionUrl = await initUpload(displayName, file, true);
+    var directId;
+    try {
+      directId = await directUpload(sessionUrl, file, onPct);
+    } catch (e) {
+      directId = undefined;
+    }
+    if (directId) return directId;
+    if (directId === null) {
+      var found = await api({ action: 'findUploadedFile', fileName: displayName });
+      if (found.fileId) return found.fileId;
+    }
+    var sessionUrl2 = await initUpload(displayName, file, false);
+    return await relayUpload(sessionUrl2, file, onPct);
+  }
+
+  async function submitForm() {
+    var status = document.getElementById('status');
+    var btn = document.getElementById('submitBtn');
+    status.className = '';
+    status.textContent = '';
+
+    var productVal = val('product');
+    if (productVal === '其他') {
+      productVal = val('productOther') || '其他';
+    }
+
+    var data = {
+      name: val('name'),
+      product: productVal,
+      duration: val('duration'),
+      age: val('age'),
+      identity: val('identity'),
+      sleepBefore: val('sleepBefore'),
+      sleepAfter: val('sleepAfter'),
+      before: val('before'),
+      scene: val('scene'),
+      change: val('change'),
+      story: val('story'),
+      oneLiner: val('oneLiner'),
+      consent: document.getElementById('consent').checked,
+      files: []
+    };
+
+    // 必填檢查
+    if (!data.name || !data.product || !data.duration || !data.before || !data.change || !data.oneLiner) {
+      status.textContent = '還有必填欄位（＊）沒填喔！';
+      status.className = 'error';
+      return;
+    }
+    if (data.before.length < 30) {
+      status.textContent = '「用之前的困擾」請再多寫一點（至少 30 字），越具體我們越能聽懂你的感受～';
+      status.className = 'error';
+      return;
+    }
+    if (data.change.length < 30) {
+      status.textContent = '「最有感的改變」請再多寫一點（至少 30 字），細節是最珍貴的部分！';
+      status.className = 'error';
+      return;
+    }
+    if (!data.consent) {
+      status.textContent = '請勾選同意刊登，我們才能把你的心得寫成故事分享出去～';
+      status.className = 'error';
+      return;
+    }
+
+    btn.disabled = true;
+    var total = pickedFiles.length;
+
+    try {
+      var items = document.querySelectorAll('#fileList .file-item');
+
+      for (var i = 0; i < total; i++) {
+        var f = pickedFiles[i];
+        overlayShow(
+          '正在上傳檔案 ' + (i + 1) + ' / ' + total,
+          f.name + '（' + prettySize(f.size) + '）'
+        );
+        overlayProgress((i / total) * 100);
+
+        var bar = items[i].querySelector('.progress-outer');
+        bar.style.display = 'block';
+        var inner = bar.querySelector('.progress-inner');
+
+        var displayName = data.name + '_' + data.product + '_' + f.name;
+
+        (function (idx, innerEl) {
+          window.__onPct = function (pct) {
+            innerEl.style.width = pct + '%';
+            overlayProgress(((idx + pct / 100) / total) * 100);
+          };
+        })(i, inner);
+
+        var fileId = await uploadOneFile(f, displayName, window.__onPct);
+        data.files.push({ name: displayName, id: fileId });
+      }
+
+      overlayShow('正在送出回覆…', '就快好了');
+      overlayProgress(100);
+      await api({ action: 'submit', data: data, submitId: SUBMIT_ID });
+
+      overlayHide();
+      document.getElementById('form').style.display = 'none';
+      document.getElementById('hero').style.display = 'none';
+      document.getElementById('done').style.display = 'block';
+      window.scrollTo(0, 0);
+    } catch (err) {
+      overlayHide();
+      status.textContent = '送出時發生問題：' + (err && err.message ? err.message : err) + '，請再試一次或聯絡管理者。';
+      status.className = 'error';
+      btn.disabled = false;
+    }
+  }
+
+  function val(id) {
+    return document.getElementById(id).value.trim();
+  }
+
+  function toggleOther() {
+    var show = document.getElementById('product').value === '其他';
+    document.getElementById('productOther').style.display = show ? 'block' : 'none';
+  }
+</script>
+</body>
+</html>
