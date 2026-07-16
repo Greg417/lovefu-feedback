@@ -141,6 +141,13 @@
   .done p { color: var(--muted); font-size: 15px; }
   .field { margin-bottom: 20px; }
   .field:last-child { margin-bottom: 0; }
+  .charcount {
+    text-align: right;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .charcount.ok { color: var(--brand); }
 
   /* ===== 上傳中全螢幕等待畫面 ===== */
   .overlay {
@@ -247,7 +254,8 @@
       <div class="field">
         <label class="q">用之前，你有什麼困擾？<span class="req">*</span></label>
         <div class="hint">請至少寫 30 個字。例如：什麼時候開始的、多常發生、對白天的影響…越具體越好</div>
-        <textarea id="before" placeholder="例：大概兩年前開始，每天躺下都要滑手機到一兩點才睡得著，隔天上班都覺得肩頸很緊、精神很差…" required></textarea>
+        <textarea id="before" placeholder="例：大概兩年前開始，每天躺下都要滑手機到一兩點才睡得著，隔天上班都覺得肩頸很緊、精神很差…" maxlength="10000" required></textarea>
+        <div class="charcount" id="beforeCount">0/10000</div>
       </div>
 
       <div class="field">
@@ -286,7 +294,8 @@
       <div class="field">
         <label class="q">用了之後，最有感的改變是什麼？<span class="req">*</span></label>
         <div class="hint">請至少寫 30 個字。身體的感覺、睡眠的變化、心情的不同都可以</div>
-        <textarea id="change" placeholder="例：最明顯是半夜不會醒來了，以前一晚醒兩三次，現在幾乎一覺到天亮，早上起來脖子也不痠了…" required></textarea>
+        <textarea id="change" placeholder="例：最明顯是半夜不會醒來了，以前一晚醒兩三次，現在幾乎一覺到天亮，早上起來脖子也不痠了…" maxlength="10000" required></textarea>
+        <div class="charcount" id="changeCount">0/10000</div>
       </div>
 
       <div class="field">
@@ -643,6 +652,21 @@
     var show = document.getElementById('product').value === '其他';
     document.getElementById('productOther').style.display = show ? 'block' : 'none';
   }
+
+  // 30 字下限區塊的即時字數（滿 30 字變品牌綠）
+  function bindCharCount(inputId, countId) {
+    var el = document.getElementById(inputId);
+    var counter = document.getElementById(countId);
+    function update() {
+      var len = el.value.length;
+      counter.textContent = len + '/10000';
+      counter.className = 'charcount' + (len >= 30 ? ' ok' : '');
+    }
+    el.addEventListener('input', update);
+    update();
+  }
+  bindCharCount('before', 'beforeCount');
+  bindCharCount('change', 'changeCount');
 </script>
 </body>
 </html>
