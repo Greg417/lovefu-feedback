@@ -302,8 +302,8 @@
     </div>
 
     <div class="card">
-      <label class="q">照片／影片分享</label>
-      <div class="hint">實際使用的照片或影片（可多個檔案）。有畫面，故事會更有溫度！</div>
+      <label class="q">照片／影片分享<span class="req">*</span></label>
+      <div class="hint">實際使用的照片或影片，至少上傳 1 個（可多個）。有畫面，故事會更有溫度！</div>
       <div class="files-box" onclick="document.getElementById('fileInput').click()">
         <div class="big">＋ 點這裡選擇檔案</div>
         <div class="small">支援照片與影片，可一次選多個</div>
@@ -573,6 +573,11 @@
     }
     if (data.change.length < 30) {
       status.textContent = '「最有感的改變」請再多寫一點（至少 30 字），細節是最珍貴的部分！';
+      status.className = 'error';
+      return;
+    }
+    if (pickedFiles.length === 0) {
+      status.textContent = '請至少上傳 1 張照片或 1 段影片，有畫面的故事更有溫度～';
       status.className = 'error';
       return;
     }
